@@ -1,0 +1,67 @@
+peluruhan.html
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulasi Peluruhan Radioaktif Pro - Fisika Inti</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #1a1a2e; color: white; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        .container { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
+        .card { background: #16213e; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        canvas { background: #0f3460; border-radius: 10px; }
+        .stats { margin-top: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 14px; }
+        .stat-box { background: #0f3460; padding: 10px; border-radius: 8px; text-align: center; border: 1px solid #e94560; }
+        .controls { margin-bottom: 20px; background: #16213e; padding: 15px; border-radius: 10px; width: 100%; max-width: 900px; display: flex; justify-content: space-around; align-items: center; }
+        button { background: #e94560; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        button:hover { background: #ff2e63; }
+        input[type=range] { cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <h1>Simulasi Peluruhan Radioaktif</h1>
+
+    <div class="controls">
+        <div>
+            <label>Laju Peluruhan (&lambda;): </label>
+            <input type="range" id="lambdaInput" min="0.005" max="0.05" step="0.005" value="0.01">
+            <span id="lambdaVal">0.01</span>
+        </div>
+        <div style="font-size: 1.2em; font-weight: bold; color: #00d2d3;">
+            Waktu: <span id="timer">0.0</span> detik
+        </div>
+        <button onclick="resetSimulasi()">Mulai Ulang</button>
+    </div>
+
+    <div class="container">
+        <div class="card">
+            <h3>Visualisasi Inti Atom</h3>
+            <canvas id="atomCanvas" width="450" height="350"></canvas>
+            <div class="stats">
+                <div class="stat-box">Inti Induk (Aktif): <br><b id="activeNum" style="color:#ff4d4d">1000</b></div>
+                <div class="stat-box">Inti Anak (Luruh): <br><b id="decayedNum" style="color:#aaa">0</b></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Grafik Fungsi N(t)</h3>
+            <canvas id="chartCanvas" width="450" height="350"></canvas>
+        </div>
+    </div>
+
+    <script>
+        const aCanvas = document.getElementById('atomCanvas');
+        const aCtx = aCanvas.getContext('2d');
+        const lambdaInput = document.getElementById('lambdaInput');
+        const lambdaVal = document.getElementById('lambdaVal');
+        const timerDisplay = document.getElementById('timer');
+        const activeDisplay = document.getElementById('activeNum');
+        const decayedDisplay = document.getElementById('decayedNum');
+
+        let atoms = [];
+        let time = 0;
+        let chart;
+        let animationId;
+        let is
